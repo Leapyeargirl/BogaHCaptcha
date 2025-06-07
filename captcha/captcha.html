@@ -27,13 +27,34 @@
 <body>
   <div id="captcha-container">
     <!-- Add your CAPTCHA here: -->
-    Hello world!
 
-    <!-- We've added a sample button. Feel free to remove it: -->
-    <button id="solve">
-      Solve!
-    </button>
+
+    Click the button to chose the level<br>
+    <!--scammer picks difficulty level, but level will actually be selected randomly-->
+    <button id="easy" onclick="alert('You chose difficult')">Easy</button><br>
+    <button id="medium" onclick="alert('You chose easy peasy')">Medium</button><br>
+    <button id="difficult" onclick="alert('You chose medium')">Difficult</button><br>
+    <button id="bitcoin" onclick="alert('You have to prove you are not a bot first...')">I just want my bitcoin</button><br>
+
+    <style>
+      button{
+    color: red;
+    background-color: pink;
+    border-radius:20px;
+        width: 150px;
+        height: 50px;
+    }
+      </style>
+
+
+      </style>
+
   </div>
+
+<!--based on button id create on click(Message)-->
+
+  <!--to create function for grid of picture-->
+  <!--to create function for rotating pieces of the picture-->
 
   <script type="text/javascript">
     (function(window, document){
