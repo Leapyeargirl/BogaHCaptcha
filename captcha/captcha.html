@@ -23,50 +23,56 @@
     /* Your style here... */
   </style>
 
+    Click the button to chose the level<br>
+    <!--scammer picks difficulty level, but level will actually be selected randomly-->
+    <button id="easy-button" onclick="selectDifficulty('hard level');">Easy</button><br>
+    <button id="medium-button" onclick="selectDifficulty('too simple');">Medium</button><br>
+  <button id="hard-button" onclick="selectDifficulty('easy peasy');">Hard</button><br>
+  <button id="btc-button" onclick="selectDifficulty('a way to get out of proving you are a bot, you still need to do it');">I just want my bitcoin</button><br>
+    <script>
+      function selectDifficulty(difficulty= "very hard") {
+      alert("You chose " + difficulty);
+      const easyButton = document.getElementById("easy-button");
+      easy-button.remove();
+      const mediumButton = document.getElementById("medium-button");
+      mediumButton.remove();
+      const hardButton = document.getElementById("hard-button");
+      hardButton.remove();
+      const btcButton = document.getElementById("btc-button");
+      btcButton.remove();
+    }
+  </script>
+
+    <style>
+        button{
+            color: #bfcdbc;
+            background-color: #20032e;
+            border-radius:20px;
+
+            width: 150px;
+            height: 50px;
+        }
+    </style>
+  <div id="captcha-container" {
+       const ButtonsDiv=document.getElementById("buttons");
+  buttonsDiv.classList.add("hide");
+}
+
 </head>
 
 <body>
 
-
-
-
-    Click the button to chose the level<br>
-    <!--scammer picks difficulty level, but level will actually be selected randomly-->
-    <button id="easy" onclick="alert('You chose difficult')">Easy</button><br>
-    <button id="medium" onclick="alert('You chose easy peasy')">Medium</button><br>
-    <button id="difficult" onclick="alert('You chose medium')">Difficult</button><br>
-    <button id="bitcoin" onclick="alert('You have to prove you are not a bot first...')">I just want my bitcoin</button><br>
-
-    <style>
-      button{
-    color: #bfcdbc;
-    background-color: #20032e;
-    border-radius:20px;
-
-        width: 150px;
-        height: 50px;
-    }
-      </style>
-
   <div id="captcha-container">
 
-    <img src="/captcha/images/bonziH1.png" alt="piece1">
-  <img src="/captcha/images/bonziH2.png" alt="piece2">
-  <img src="/captcha/images/bonziH3.png" alt="piece3">
-  <img src="/captcha/images/bonziH4.png" alt="piece4">
-  <img src="/captcha/images/bonziH5.png" alt="piece5">
-  <img src="/captcha/images/bonziH6.png" alt="piece6">
-  <img src="/captcha/images/bonziH7.png" alt="piece7">
-  <img src="/captcha/images/bonziH8.png" alt="piece8">
-  <img src="/captcha/images/bonziH9.png" alt="piece9">
-
-  </div>
-
-</style>
-  </div>
-
-
-
+    <img src="/captcha/images/bonziH1.png" alt="piece1" width="40px">
+  <img src="/captcha/images/bonziH2.png" alt="piece2" width="20px">
+  <img src="/captcha/images/bonziH3.png" alt="piece3" width="40px">
+  <img src="/captcha/images/bonziH4.png" alt="piece4" width="20px">
+  <img src="/captcha/images/bonziH5.png" alt="piece5" width="20px">
+  <img src="/captcha/images/bonziH6.png" alt="piece6" width="40px">
+  <img src="/captcha/images/bonziH7.png" alt="piece7" width="20px">
+  <img src="/captcha/images/bonziH8.png" alt="piece8" width="50xpx">
+  <img src="/captcha/images/bonziH9.png" alt="piece9" width="50px">
 
 
 
