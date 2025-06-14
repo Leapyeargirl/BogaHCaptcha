@@ -71,6 +71,47 @@
         window.top.postMessage("success", '*');
       }
 
+      var image = new Image();
+      image.onload = cutImageUp;
+      image.src = 'Images/bonziH.png';
+
+      function cutImageUp() {
+        // Initialize values
+        const difficulty = 3;
+
+        // currently set equal to difficulty
+        const numRows = difficulty;
+        const numCols = difficulty;
+
+        const totalWidth = 300;
+        const totalHeight = 300;
+
+        const pieceWidth = totalWidth / numCols;
+        const pieceHeight = totalHeight / numRows;
+
+        // Initialize empty piece array
+        var imagePieces = [];
+        // Cycle through increasing x and y vals
+        for(var x = 0; x < numCols; ++x) {
+          for(var y = 0; y < numRows; ++y) {
+            // create canvas
+            var canvas = document.createElement('canvas');
+            canvas.width = pieceWidth;
+            canvas.height = pieceHeight;
+            var context = canvas.getContext('2d');
+            // draw image to canvas
+            context.drawImage(image, x * pieceWidth, y * pieceHeight, pieceWidth, pieceHeight, 0, 0, canvas.width, canvas.height);
+            imagePieces.push(canvas.toDataURL());
+          }
+        }
+
+        // imagePieces now contains data urls of all the pieces of the image
+
+        // load one piece onto the page
+        // var anImageElement = document.getElementById('myImageElementInTheDom');
+        // anImageElement.src = imagePieces[0];
+      }
+
       // Your CAPTCHA code goes here, we've added a simple example below:
       document.getElementById('solve')
            .addEventListener('click', () => captchaSuccess());
