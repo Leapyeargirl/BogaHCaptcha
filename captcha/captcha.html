@@ -106,18 +106,23 @@
 
         // imagePieces now contains data urls of all the pieces of the image
 
-          for(let i = 0, n = imagePieces.length; i < n; i++) {
-            // let anImageElement = document.getElementById('captcha-container');
-            // anImageElement.src = imagePieces[0];
-            let imagePiece = imagePieces[i];
-            imagePiece.src = imagePieces[i].src;
+        // Test array
+        let testArray = ["/captcha/images/bonziH1.png", "/captcha/images/bonziH2.png", "/captcha/images/bonziH3.png"]
 
-            let imageElement = document.getElementById(imagePiece);
-            // console.log(imageElement);
-            console.log(imagePiece);
-            // <img src=imagePiece alt="piece1" width="40px">
 
-            // no work :( need a way to show things
+
+        for(let i = 0, n = testArray.length; i < n; i++) {
+          // let anImageElement = document.getElementById('captcha-container');
+          // anImageElement.src = testArray[0];
+          let imagePiece = testArray[i];
+          imagePiece.src = testArray[i].src;
+
+          let imageElement = document.getElementById(imagePiece);
+          // console.log(imageElement);
+          console.log(imagePiece);
+          // <img src=imagePiece alt="piece1" width="40px">
+
+          // no work :( need a way to show things
 
         }
 
