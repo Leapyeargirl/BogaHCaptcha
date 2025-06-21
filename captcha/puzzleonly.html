@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <title>Puzzle</title>
+        <style type="text/css">
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            }
+
+            html {
+                font-size: 62.5%;
+            }
+
+            :root {
+                /* Also set view window here just in case we need to change it lol */
+                --defaultViewWindowValue: 50;
+                --defaultViewWindow: calc(var(--defaultViewWindowValue)*1vw);
+                --width: var(--defaultViewWindow);
+                --height: var(--defaultViewWindow);
+                /* Set default difficulty to 0 here so it's obvious when something breaks*/
+                --difficulty: 0;
+            }
+
+            .container {
+                height: 100vh;
+                display: grid;
+                place-items: center;
+                background-color: #ccccf1;
+                overflow: hidden;
+            }
+
+            .puzzle-wrapper {
+                width: calc(var(--defaultViewWindowValue)*1vw);
+                display: flex;
+                justify-content: space-around;
+                flex-wrap: wrap;
+                gap: 5rem;
+
+            }
+            .cells {
+                width: var(--width);
+                height: var(--height);
+                border: .1rem dashed #fff;
+                background-color: #bdbdf0;
+                display: grid;
+                /* Dynamically produce grids based on global variables */
+                grid-template-columns: repeat(var(--difficulty), calc(var(--width) / var(--difficulty)));
+                grid-template-rows: repeat(var(--difficulty), calc(var(--height) / var(--difficulty)));
+                position: relative;
+            }
+            .cells div {
+                /*!* Uncomment to add dotted lines between the cells *!*/
+                /*border-right: .1rem dashed #fff;*/
+                /*border-bottom: .1rem dashed #fff;*/
+                /*border-left: .1rem dashed #fff;*/
+                /*border-top: .1rem dashed #fff;*/
+            }
+            .cells div {
+                transition: background-color 0.3s;
+            }
+            .cells div.active {
+                background-color: #9898ec;
+            }
+            .cells div div{
+                width: 100%;
+                height: 100%;
+                background-size: var(--width) var(--height);
+                background-repeat: no-repeat;
+                animation: dropAnim 0.6s forwards;
+            }
+            @keyframes dropAnim {
+                0% {
+                    opacity: 0.5;
+                }
+                100% {
+                    opacity: 1;
+                }
+            }
+
+            .cells div {
+                background-size: var(--width) var(--height);
+                background-repeat: no-repeat;
+                position: absolute;
+                width: calc(var(--width) / var(--difficulty));
+                height: calc(var(--height) / var(--difficulty));
+                cursor: grab;
+            }
+
+            .btn {
+                background-color: rgba(109, 161, 240, .588);
+                box-sizing: content-box;
+                padding: 1rem;
+                color: #ffffff;
+                font-size: 1.1rem;
+                text-transform: uppercase;
+                letter-spacing: .1rem;
+                font-weight: 500;
+                border-radius: 2rem;
+                cursor: pointer;
+                border: 0.1rem solid #fff;
+                width: max-content;
+                transition: background-color 0.3s;
+            }
+
+            .btn:hover {
+                background-color: rgba(109, 161, 240, .808);
+            }
+
+            .modal {
+                position: fixed;
+                inset: 0;
+                background-color: rgba(44, 42, 42, 0.718);
+                display: grid;
+                place-items: center;
+                opacity: 0;
+                visibility: hidden;
+                transition: opacity 0.5s;
+            }
+
+            .modal-content {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                row-gap: 1rem;
+                width: 40rem;
+                aspect-ratio: 1;
+                background-color: #ccccf1;
+                color: #333;
+                border-radius: 1rem;
+            }
+
+            .modal-heading {
+                font-size: 4rem;
+            }
+
+            .modal-text {
+                font-size: 1.8rem;
+                text-transform: uppercase;
+            }
+
+            .modal-btn {
+                margin-top: 2rem;
+            }
+
+        </style>
+    </head>
+    <body>
+    <!--for initializing the puzzle divs; need to make cell width and height variables-->
+        <div class="container">
+            <div class="puzzle-wrapper">
+                <div class="cells"></div>
+            </div>
+            <div class="modal">
+                <div class="modal-content">
+                    <h2 class="modal-heading">Puzzle Finished!</h2>
+                    <h3 class="modal-text">WINNER!</h3>
+                    <button class="modal-btn btn">Start Again</button>
+                </div>
+            </div>
+        </div>
+
+    <script type="text/javascript">
+        // Make variable difficulty
+        let difficulty = 5;
+
+        // if we want to randomly pick a difficulty
+        let random = true;
+        if (random) {
+            let randomDifficulties = [3, 4, 5]
+
+            let randomPick = Math.floor(Math.random() * randomDifficulties.length)
+
+            difficulty = randomDifficulties[randomPick]
+            console.log("Difficulty: " + difficulty);
+        }
+
+        let totalCells = difficulty ** 2;
+
+        // Set our styling to use this difficulty
+        const root = document.documentElement;
+        root.style.setProperty("--difficulty", difficulty);
+
+        // Get our defaultWindowViewValue from root, use to chop up image
+        const defaultViewWindowValue = getComputedStyle(root).getPropertyValue("--defaultViewWindowValue");
+
+        // Use difficulty to generate an array of evenly spaced values within our given view window
+        // E.g. difficulty 3 inside 30vw -> [0, 10, 20] so they fit 0-10, 10-20 and 20-30
+        function generateSeparationArray(difficulty, defaultViewWindowValue) {
+            let returnArray = []
+            const divisor = defaultViewWindowValue / difficulty;
+
+            // Generate array
+            for (let i = 0; i < difficulty; i++) {
+                returnArray.push(divisor * i)
+            }
+
+            return returnArray;
+        }
+
+        // get array of values for setting things in the right places
+        const separationArray = generateSeparationArray(difficulty, defaultViewWindowValue);
+
+
+        // Initialize orderedArray for comparison later
+        let orderedArray;
+
+        // Code to initialize image elements
+        class Elements {
+            constructor() {
+                // Assigns amount of cells based on difficulty
+                this.cellsAmount = totalCells;
+                // Create all our funky little elements
+                this.draggableDivs = []
+                this.cells = document.querySelector(".cells")
+                this.modal = document.querySelector(".modal")
+                this.modalText = document.querySelector(".modal-text")
+                this.modalBtn = document.querySelector(".modal-btn")
+                this.attempt = document.querySelector(".attempt")
+                this.createElements()
+            }
+
+            createElements() {
+                // For loop to iterate over cells
+                for(let index = 0; index < this.cellsAmount; index++) {
+                    // Make draggable divs
+                    const draggableDiv = document.createElement("div")
+                    draggableDiv.setAttribute("data-index", index)
+                    draggableDiv.setAttribute("draggable", true)
+                    this.draggableDivs.push(draggableDiv)
+                }
+            }
+        }
+
+        class PositionElements {
+            constructor() {
+                this.elements = new Elements()
+                this.leftPositions = [...separationArray]  // Copies of array we generated for separations
+                this.topPositions = [...separationArray]
+                this.addDraggableDivs()
+            }
+
+            // Shuffles positions randomly
+            shuffle(array) {
+                return array.sort(() => Math.random() - 0.5)  // Sort randomly
+            }
+
+            shufflePositions() {
+                return this.shuffle(this.leftPositions)
+                    .map((leftPosition) => {
+                        return this.shuffle(this.topPositions).map
+                        ((topPosition) => [leftPosition, topPosition])
+                    }).reduce((positions, item) => [...positions, ...item])
+            }
+
+            // Takes in positions, turns into array of array positions
+            bgPositions() {
+                return this.topPositions.map((topPosition) => {
+                    return this.leftPositions.map((leftPosition) =>
+                        [topPosition, leftPosition])
+                }).reduce((positions, item) => [...positions, ...item])
+            }
+
+
+            // Makes the divs
+            addDraggableDivs() {
+                const {cells, draggableDivs} = this.elements
+                const bgPositions = this.bgPositions()
+                // Set what the final solution needs to be
+                orderedArray = bgPositions;
+                console.log(orderedArray);
+                const shufflePositions = this.shufflePositions()
+
+                // Iterate over each div and set the shuffled image inside them
+                draggableDivs.forEach((div, i) => {
+                    // Set background image
+                    div.style.backgroundImage = 'url(images/bonziH.png)'
+                    cells.append(div)
+                    // Make sure background image sits in the right spot in the div
+                    div.style.backgroundPosition = `-${bgPositions[i][1]}vw -${bgPositions[i][0]}vw`
+                    // Set where this div sits in the grid
+                    div.style.left = `${shufflePositions[i][0]}vw`
+                    div.style.top = `${shufflePositions[i][1]}vw`
+                })
+
+            }
+
+        }
+
+        class DragDrop {
+            constructor() {
+                this.positionElements = new PositionElements()
+                this.selected = 0
+                this.dragDropEvents()
+                this.points = {correct: 0, wrong: 0}
+            }
+
+
+            dragDropEvents() {
+                const {draggableDivs, modal, modalText, modalBtn, attempt, cellsAmount} =
+                    this.positionElements.elements
+
+                draggableDivs.forEach((draggableDiv, i) => {
+                    draggableDiv.addEventListener('dragstart', (e) => {
+                        this.selected = e.target
+                        console.log('dragstart')
+                    })
+                    draggableDivs[i].addEventListener('dragover', (e) => {
+                        e.preventDefault()
+                        console.log('dragover')
+                    })
+                    // Swaps element with other one that's there
+                    draggableDivs[i].addEventListener('drop', () => {
+                        console.log(this.selected.dataset.index);
+                        console.log(i);
+                        // Retrieve each div element
+                        const elementOne = draggableDivs[i]
+                        const elementTwo = draggableDivs[this.selected.dataset.index]
+                        const propsToSwap = ["backgroundImage", "left", "top"];
+
+                        for (const prop of propsToSwap) {
+                            const temp = elementOne.style[prop];
+                            elementOne.style[prop] = elementTwo.style[prop];
+                            elementTwo.style[prop] = temp;
+                        }
+
+
+                        // Compare two arrays and see if they match
+                        function positionsMatch(draggableDivs, orderedArray) {
+                            // Check order of all draggableDivs, compare to orderedArray
+                            console.log(draggableDivs.length, orderedArray.length)
+                            let returnValue = true;
+                            // Iterate over all values
+                            for (let i = 0; i < orderedArray.length; i++) {
+                                let draggableTop = Math.trunc(parseFloat(draggableDivs[i].style.top))
+                                let draggableLeft = Math.trunc(parseFloat(draggableDivs[i].style.left))
+                                let orderedTop = Math.trunc(parseFloat(orderedArray[i][0]))
+                                let orderedLeft = Math.trunc(parseFloat(orderedArray[i][1]))
+                                // console.log(draggableTop, draggableLeft, orderedTop, orderedLeft);
+
+                                // If either don't match, switch return value to false
+                                if (orderedLeft !== draggableLeft || orderedTop !== draggableTop) {
+                                    returnValue = false;
+                                    console.log("Wrong position!")
+                                }
+                                else {
+                                    console.log("Correct position")
+                                }
+                            }
+                            console.log(returnValue)
+                            return returnValue;
+                        }
+
+                        // Win condition
+                        if(positionsMatch(draggableDivs, orderedArray)) {
+                            modal.style.cssText = "opacity: 1; visibility: visible;"
+                            modalBtn.onclick = () => location.reload()
+                        }
+
+                    })
+                    draggableDivs[i].addEventListener('dragenter', (e) => {
+                        draggableDivs[i].classList.add("active")
+                    })
+                    draggableDivs[i].addEventListener('dragleave', (e) => {
+                        console.log("leave")
+                        draggableDivs[i].classList.remove("active")
+                    })
+                })
+            }
+        }
+
+        new DragDrop()
+    </script>
+    </body>
+</html>

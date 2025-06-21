@@ -18,22 +18,115 @@
       background: white;
       width: 390px;
       height: 300px;
+      overflow: hidden;
+      display: grid;
+      place-items: center;
     }
 
     /* Your style(s) here... */
     button{
-      color: #a6094a;
+      color: #e85089;
       background-color: #20032e;
       border-radius:20px;
-
-      width: 380px;
-      height: 65px;
+      width: 100%;
+      height: 25%;
       padding: 5px;
-      margin: 5px;
+      margin: 0px;
       border-radius: solid;
-      position: static;
+      position: relative;
+      place-items: center;
       grid: flex;
     }
+
+    .buttons{
+      width: 100%;
+      height: 100%;
+      background-color: #bdbdf0;
+
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    :root {
+      /* Also set view window here. If we can get DragDrop to fire after  */
+      --defaultViewWindowValue: 0;
+      --defaultViewWindow: calc(var(--defaultViewWindowValue)*1vw);
+      --width: var(--defaultViewWindow);
+      --height: var(--defaultViewWindow);
+      /* Set default difficulty to 0 here at first so it's obvious when something breaks*/
+      --difficulty: 0;
+      --display: none;
+    }
+
+    .container {
+      width: calc(var(--defaultViewWindowValue)*1vw);
+      display: grid;
+      place-items: center;
+      background-color: #ccccf1;
+      overflow: hidden;
+      /*display: var(--display);*/
+      position: absolute;
+    }
+
+    .puzzle-wrapper {
+      width: calc(var(--defaultViewWindowValue)*1vw);
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+      gap: 5rem;
+
+    }
+    .cells {
+      width: var(--width);
+      height: var(--height);
+      border: .1rem dashed #fff;
+      background-color: #bdbdf0;
+      display: grid;
+      /* Dynamically produce grids based on global variables */
+      grid-template-columns: repeat(var(--difficulty), calc(var(--width) / var(--difficulty)));
+      grid-template-rows: repeat(var(--difficulty), calc(var(--height) / var(--difficulty)));
+      position: relative;
+    }
+    .cells div {
+      background-size: var(--width) var(--height);
+      background-repeat: no-repeat;
+      position: absolute;
+      width: calc(var(--width) / var(--difficulty));
+      height: calc(var(--height) / var(--difficulty));
+      cursor: grab;
+      /* Uncomment to add dotted lines between the cells */
+      border-right: .1rem dashed #fff;
+      border-bottom: .1rem dashed #fff;
+      border-left: .1rem dashed #fff;
+      border-top: .1rem dashed #fff;
+    }
+    .cells div {
+      transition: background-color 0.3s;
+    }
+    .cells div.active {
+      background-color: #9898ec;
+    }
+    .cells div div{
+      width: 100%;
+      height: 100%;
+      background-size: var(--width) var(--height);
+      background-repeat: no-repeat;
+      animation: dropAnim 0.6s forwards;
+    }
+    @keyframes dropAnim {
+      0% {
+        opacity: 0.5;
+      }
+      100% {
+        opacity: 1;
+      }
+    }
+
   </style>
 
 
@@ -42,14 +135,23 @@
 
 <body>
   <div id="captcha-container">
-    <button id="easy-button" onClick="selectDifficulty('hard level');">Easy</button><br>
-    <button id="medium-button" onClick="selectDifficulty('not too easy');">Medium</button><br>
-    <button id="hard-button" onClick="selectDifficulty('easy peasy');">Hard</button><br>
-    <button id="bitcoin-button" onClick="selectDifficulty('to get out of the human verification, but you still need to prove you are not a robot...');">I just want my bitcoin!</button>
+    <!--for initializing the puzzle divs-->
+    <div class="container">
+      <div class="puzzle-wrapper">
+        <div class="cells"></div>
+      </div>
+    </div>
+    <div class="buttons">
+      <button id="easy-button" onClick="selectDifficulty('hard level');">Easy</button>
+      <button id="medium-button" onClick="selectDifficulty('not too easy');">Medium</button>
+      <button id="hard-button" onClick="selectDifficulty('easy peasy');">Hard</button>
+      <button id="bitcoin-button" onClick="selectDifficulty('to get out of the human verification, but you still need to prove you are not a robot...');">I just want my Bitcoin!</button>
+    </div>
+
 
     <script>
-      function selectDifficulty(difficulty) {
-        alert("You wanted " + difficulty);
+      function selectDifficulty(buttonDifficulty) {
+        alert("You wanted " + buttonDifficulty);
         const easyButton = document.getElementById("easy-button");
         easyButton.remove();
         const mediumButton = document.getElementById("medium-button");
@@ -58,90 +160,240 @@
         hardButton.remove();
         const bitcoinButton = document.getElementById("bitcoin-button");
         bitcoinButton.remove();
+        // Now show puzzle
+        // root.style.setProperty("--display", 'block');
+
       }
     </script>
 
 
 
+
     <script type="text/javascript">
     (function(window, document){
-      // Code to cut up image into sections
-      let image = new Image();
-      image.onload = cutImageUp;
-      image.src = "https://media.geeksforgeeks.org/wp-content/uploads/20231228172727/gfg-image.jpg";
 
-      function cutImageUp() {
-        // Initialize values
-        var difficulty = 3;
+      // Make variable difficulty
+      let difficulty = 4;
 
-        // currently set equal to difficulty
-        const numRows = difficulty;
-        const numCols = difficulty;
+      // if we want to randomly pick a difficulty
+      let random = true;
+      if (random) {
+        let randomDifficulties = [3, 4, 5]
 
-        const totalWidth = 300;
-        const totalHeight = 300;
+        let randomPick = Math.floor(Math.random() * randomDifficulties.length)
 
-        const pieceWidth = totalWidth / numCols;
-        const pieceHeight = totalHeight / numRows;
+        difficulty = randomDifficulties[randomPick]
+        console.log("Difficulty: " + difficulty);
+      }
 
-        // Initialize empty piece array
-        var imagePieces = [];
-        // Cycle through increasing x and y vals
-        for(let x = 0; x < numCols; ++x) {
-          for(let y = 0; y < numRows; ++y) {
-            // create canvas
-            let canvas = document.createElement('canvas');
-            canvas.width = pieceWidth;
-            canvas.height = pieceHeight;
-            let context = canvas.getContext('2d');
-            // draw image to canvas
-            context.drawImage(image, x * pieceWidth, y * pieceHeight, pieceWidth, pieceHeight, 0, 0, canvas.width, canvas.height);
-            imagePieces.push(canvas.toDataURL());
+
+
+      let totalCells = difficulty ** 2;
+
+      // Set our styling to use this difficulty
+      const root = document.documentElement;
+      root.style.setProperty("--difficulty", difficulty);
+
+      // Set up view width now puzzle is initialized
+      root.style.setProperty("--defaultViewWindowValue", 70);
+
+      // Get our defaultWindowViewValue from root, use to chop up image
+      const defaultViewWindowValue = getComputedStyle(root).getPropertyValue("--defaultViewWindowValue");
+
+      // Use difficulty to generate an array of evenly spaced values within our given view window
+      // E.g. difficulty 3 inside 30vw -> [0, 10, 20] so they fit 0-10, 10-20 and 20-30
+      function generateSeparationArray(difficulty, defaultViewWindowValue) {
+        let returnArray = []
+        const divisor = defaultViewWindowValue / difficulty;
+
+        // Generate array
+        for (let i = 0; i < difficulty; i++) {
+          returnArray.push(divisor * i)
+        }
+
+        return returnArray;
+      }
+
+      // get array of values for setting things in the right places
+      const separationArray = generateSeparationArray(difficulty, defaultViewWindowValue);
+
+
+      // Initialize orderedArray for comparison later
+      let orderedArray;
+
+      // Code to initialize image elements
+      class Elements {
+        constructor() {
+          // Assigns amount of cells based on difficulty
+          this.cellsAmount = totalCells;
+          // Create all our funky little elements
+          this.draggableDivs = []
+          this.cells = document.querySelector(".cells")
+          this.createElements()
+        }
+
+        createElements() {
+          // For loop to iterate over cells
+          for(let index = 0; index < this.cellsAmount; index++) {
+            // Make draggable divs
+            const draggableDiv = document.createElement("div")
+            draggableDiv.setAttribute("data-index", index)
+            draggableDiv.setAttribute("draggable", true)
+            this.draggableDivs.push(draggableDiv)
           }
         }
+      }
 
-        // <img src="/captcha/images/bonziH1.png">
-        // <img src="/captcha/images/bonziH2.png">
-        // <img src="/captcha/images/bonziH3.png">
+      class PositionElements {
+        constructor() {
+          this.elements = new Elements()
+          this.leftPositions = [...separationArray]  // Copies of array we generated for separations
+          this.topPositions = [...separationArray]
+          this.addDraggableDivs()
+        }
 
-        // imagePieces now contains data urls of all the pieces of the image
+        // Shuffles positions randomly
+        shuffle(array) {
+          return array.sort(() => Math.random() - 0.5)  // Sort randomly
+        }
 
-        // Test array
-        let testArray = ["/captcha/images/bonziH1.png", "/captcha/images/bonziH2.png", "/captcha/images/bonziH3.png"]
+        shufflePositions() {
+          return this.shuffle(this.leftPositions)
+                  .map((leftPosition) => {
+                    return this.shuffle(this.topPositions).map
+                    ((topPosition) => [leftPosition, topPosition])
+                  }).reduce((positions, item) => [...positions, ...item])
+        }
+
+        // Takes in positions, turns into array of array positions
+        bgPositions() {
+          return this.topPositions.map((topPosition) => {
+            return this.leftPositions.map((leftPosition) =>
+                    [topPosition, leftPosition])
+          }).reduce((positions, item) => [...positions, ...item])
+        }
 
 
+        // Makes the divs
+        addDraggableDivs() {
+          const {cells, draggableDivs} = this.elements
+          const bgPositions = this.bgPositions()
+          // Set what the final solution needs to be
+          orderedArray = bgPositions;
+          console.log(orderedArray);
+          const shufflePositions = this.shufflePositions()
 
-        for(let i = 0, n = testArray.length; i < n; i++) {
-          // let anImageElement = document.getElementById('captcha-container');
-          // anImageElement.src = testArray[0];
-          let imagePiece = testArray[i];
-          imagePiece.src = testArray[i].src;
-
-          let imageElement = document.getElementById(imagePiece);
-          // console.log(imageElement);
-          console.log(imagePiece);
-          // <img src=imagePiece alt="piece1" width="40px">
-
-          // no work :( need a way to show things
+          // Iterate over each div and set the shuffled image inside them
+          draggableDivs.forEach((div, i) => {
+            // Set background image
+            div.style.backgroundImage = 'url(images/bonziH.png)'
+            cells.append(div)
+            // Make sure background image sits in the right spot in the div
+            div.style.backgroundPosition = `-${bgPositions[i][1]}vw -${bgPositions[i][0]}vw`
+            // Set where this div sits in the grid
+            div.style.left = `${shufflePositions[i][0]}vw`
+            div.style.top = `${shufflePositions[i][1]}vw`
+          })
 
         }
 
-        // load one piece onto the page
-        // var anImageElement = document.getElementById('captcha-container');
-        // anImageElement.src = imagePieces[0];
       }
+
+      class DragDrop {
+        constructor() {
+          this.positionElements = new PositionElements()
+          this.selected = 0
+          this.dragDropEvents()
+        }
+
+
+        dragDropEvents() {
+          const {draggableDivs, modal, modalText, modalBtn, attempt, cellsAmount} =
+                  this.positionElements.elements
+
+          draggableDivs.forEach((draggableDiv, i) => {
+            draggableDiv.addEventListener('dragstart', (e) => {
+              this.selected = e.target
+              console.log('dragstart')
+            })
+            draggableDivs[i].addEventListener('dragover', (e) => {
+              e.preventDefault()
+              console.log('dragover')
+            })
+            // Swaps element with other one that's there
+            draggableDivs[i].addEventListener('drop', () => {
+              console.log(this.selected.dataset.index);
+              console.log(i);
+              // Retrieve each div element
+              const elementOne = draggableDivs[i]
+              const elementTwo = draggableDivs[this.selected.dataset.index]
+              const propsToSwap = ["backgroundImage", "left", "top"];
+
+              for (const prop of propsToSwap) {
+                const temp = elementOne.style[prop];
+                elementOne.style[prop] = elementTwo.style[prop];
+                elementTwo.style[prop] = temp;
+              }
+
+
+              // Compare two arrays and see if they match
+              function positionsMatch(draggableDivs, orderedArray) {
+                // Check order of all draggableDivs, compare to orderedArray
+                console.log(draggableDivs.length, orderedArray.length)
+                let returnValue = true;
+                // Iterate over all values
+                for (let i = 0; i < orderedArray.length; i++) {
+                  let draggableTop = Math.trunc(parseFloat(draggableDivs[i].style.top))
+                  let draggableLeft = Math.trunc(parseFloat(draggableDivs[i].style.left))
+                  let orderedTop = Math.trunc(parseFloat(orderedArray[i][0]))
+                  let orderedLeft = Math.trunc(parseFloat(orderedArray[i][1]))
+                  // console.log(draggableTop, draggableLeft, orderedTop, orderedLeft);
+
+                  // If either don't match, switch return value to false
+                  if (orderedLeft !== draggableLeft || orderedTop !== draggableTop) {
+                    returnValue = false;
+                    console.log("Wrong position!")
+                  }
+                  else {
+                    console.log("Correct position")
+                  }
+                }
+                console.log(returnValue)
+                return returnValue;
+              }
+
+              // Win condition
+              if(positionsMatch(draggableDivs, orderedArray)) {
+                captchaSuccess()
+              }
+
+            })
+            draggableDivs[i].addEventListener('dragenter', (e) => {
+              draggableDivs[i].classList.add("active")
+            })
+            draggableDivs[i].addEventListener('dragleave', (e) => {
+              console.log("leave")
+              draggableDivs[i].classList.remove("active")
+            })
+          })
+        }
+      }
+
+      // Initialize the puzzle
+      new DragDrop();
 
       // This is how you tell the parent window that the CAPTCHA was successful.
       function captchaSuccess() {
         window.top.postMessage("success", '*');
       }
+      //
+      // // Your CAPTCHA code goes here, we've added a simple example below:
+      // document.getElementById('solve')
+      //      .addEventListener('click', () => captchaSuccess());
 
-      // Your CAPTCHA code goes here, we've added a simple example below:
-      document.getElementById('solve')
-           .addEventListener('click', () => captchaSuccess());
 
     })(window, document);
-  </script>
+    </script>
   </div>
 </body>
 </html>
