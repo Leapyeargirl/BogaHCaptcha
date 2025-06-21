@@ -1,3 +1,7 @@
+EDIT:
+Leapyeargirl happens to be a quilling artist, and previously made a quilling art piece of BogaH. Our idea was to use real life Boga-themed art (absolutely not able to be recreated by AI) and mix it with this Captcha project. Scammers will have to solve the puzzle, made of the BogaH quilling art, in order to solve the Captcha. 
+We had a lot of useful help from :https://www.youtube.com/watch?v=39TLSHWJHoY
+
 # Kitboga Code Jam
 "I'm not a robot!"
 
@@ -83,6 +87,7 @@ Entries will shortlisted by a panel of Kitboga Show team members, and will be ju
 Don't forget to read the license in TERMS.md, which you'll need to agree to in order to take part.
 
 Go here: https://kitboga.com/codejam
+
 
 ## (Optional) Live Demo
 Add a publicly viewable demo for your CAPTCHA by enabling GitHub Pages in your repository settings. Navigate to `Settings` > `Pages`, then under `Branch`, select `main`, and then press `Save`. Once the site is built the URL will appear.
