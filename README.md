@@ -1,5 +1,6 @@
 EDIT:
 Leapyeargirl happens to be a quilling artist, and previously made a quilling art piece of BogaH. Our idea was to use real life Boga-themed art (absolutely not able to be recreated by AI) and mix it with this Captcha project. Scammers will have to solve the puzzle, made of the BogaH quilling art, in order to solve the Captcha. 
+We had a lot of useful help from :https://www.youtube.com/watch?v=39TLSHWJHoY
 
 # Kitboga Code Jam
 "I'm not a robot!"
